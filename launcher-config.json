@@ -1,0 +1,21 @@
+{
+  "launcherVersion": "0.1.0-preview",
+  "packName": "Emipokemon",
+  "minecraftVersion": "1.21.1",
+  "loader": "Fabric",
+  "serverName": "Cobbleverse",
+  "serverAddress": "play.emipokemon.local",
+  "packChannel": "preview",
+  "news": [
+    {
+      "tag": "NUEVO",
+      "title": "Launcher propio en desarrollo",
+      "body": "Una sola instalación para mantener Emipokemon, mods custom, configs y recursos siempre actualizados."
+    },
+    {
+      "tag": "SERVIDOR",
+      "title": "Cobbleverse + Emipokemon",
+      "body": "Gacha, protecciones, eventos y sistemas propios convivirán en una instalación administrada por el launcher."
+    }
+  ]
+}
