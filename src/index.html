@@ -6,28 +6,29 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self';" />
   <title>EmiLauncher</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="v02.css" />
 </head>
 <body>
   <main class="app-shell">
     <section class="left-column">
       <header class="topbar">
         <div class="brand">
-          <div class="brand-orb">✦</div>
+          <div class="brand-orb pokeball-mark" aria-hidden="true"><span></span></div>
           <div class="brand-copy">
             <h1>EMILAUNCHER</h1>
             <span>Emipokemon · Cobbleverse</span>
           </div>
         </div>
 
-        <div>
-          <button class="account-button" type="button" aria-label="Cuenta Microsoft">
+        <div class="account-actions">
+          <button id="accountButton" class="account-button" type="button" aria-label="Cuenta Microsoft">
             <span class="account-dot"></span>
             <span class="account-copy">
               <strong>Cuenta Microsoft</strong>
-              <small>Iniciar sesión</small>
+              <small id="accountStatus">Iniciar sesión</small>
             </span>
           </button>
-          <button id="settingsButton" class="icon-button" type="button" aria-label="Ajustes">⚙</button>
+          <button id="settingsButton" class="icon-button" type="button" aria-label="Ajustes" title="Ajustes">⚙</button>
         </div>
       </header>
 
@@ -49,22 +50,22 @@
             <strong>Fabric</strong>
           </div>
           <div class="info-chip">
-            <span>Pack</span>
-            <strong>Emipokemon Preview</strong>
+            <span>Pack remoto</span>
+            <strong id="packVersion">Consultando...</strong>
           </div>
         </div>
       </section>
 
-      <section class="news-grid" aria-label="Noticias">
-        <article class="news-card">
-          <span class="tag">NUEVO</span>
-          <h3>Launcher propio en desarrollo</h3>
-          <p>La primera versión define la identidad visual. Después conectaremos Microsoft, actualizaciones y el arranque real de Minecraft.</p>
+      <section id="newsGrid" class="news-grid" aria-label="Noticias">
+        <article class="news-card loading-card">
+          <span class="tag">NOTICIAS</span>
+          <h3>Buscando novedades...</h3>
+          <p>Conectando con el canal oficial de EmiLauncher.</p>
         </article>
-        <article class="news-card">
-          <span class="tag">SERVIDOR</span>
-          <h3>Cobbleverse + sistemas de Emi</h3>
-          <p>Gacha, protecciones, eventos y futuros mods podrán actualizarse desde una sola instalación.</p>
+        <article class="news-card loading-card">
+          <span class="tag">EMI</span>
+          <h3>Contenido remoto</h3>
+          <p>Las noticias nuevas aparecerán aquí sin reinstalar el launcher.</p>
         </article>
       </section>
 
@@ -74,41 +75,87 @@
           <div class="launch-meta">
             <strong>Cobbleverse · Emipokemon</strong>
             <span class="server-online">● Servidor preparado</span>
-            <span>Fabric 1.21.1 · Preview visual</span>
+            <span id="launchSubtext">Fabric 1.21.1 · Preparando sistemas reales</span>
           </div>
         </div>
 
         <div class="update-card">
           <div class="label-row">
             <span>Actualizador</span>
-            <span id="updateText">Verificando...</span>
+            <span id="updateText">Comprobando...</span>
           </div>
           <div class="progress-track"><div class="progress-bar"></div></div>
-          <small>Comparando versión y archivos del pack</small>
+          <small id="updateDetail">Consultando versión del launcher, pack y noticias.</small>
         </div>
       </section>
     </section>
 
     <aside class="hero-card" aria-label="Decoración Emipokemon">
       <div class="hero-top">
-        <span class="preview-pill">PREVIEW VISUAL</span>
-        <span class="version-pill">v0.1.0</span>
+        <span class="preview-pill">PREVIEW FUNCIONAL</span>
+        <span id="versionPill" class="version-pill">v0.2.0</span>
       </div>
 
-      <img class="emote-collage" src="assets/emotes-collage.webp" alt="Emotes de Emi" draggable="false" />
+      <div class="emote-stage" aria-label="Emotes de Emi">
+        <img class="emote emote-a" src="assets/emotes/emote-1.png" alt="Emote de Emi" draggable="false" />
+        <img class="emote emote-b" src="assets/emotes/emote-2.png" alt="Emote de Emi" draggable="false" />
+        <img class="emote emote-c" src="assets/emotes/emote-3.png" alt="Emote de Emi" draggable="false" />
+        <img class="emote emote-d" src="assets/emotes/emote-4.png" alt="Emote de Emi" draggable="false" />
+        <img class="emote emote-e" src="assets/emotes/emote-5.png" alt="Emote de Emi" draggable="false" />
+        <div class="hero-pokeball" aria-hidden="true"><span></span></div>
+      </div>
 
       <div class="hero-copy">
-        <strong>♡ Hecho para la comunidad de Emi</strong>
-        <span>Rosa, morado y los emotes formarán la identidad común del launcher y de nuestros GUIs custom.</span>
+        <strong>♡ Noticias y actualizaciones de Emi</strong>
+        <span id="newsFreshness">El launcher comprueba contenido remoto al abrirse.</span>
       </div>
     </aside>
   </main>
 
-  <aside id="settingsPanel" class="settings-panel" aria-label="Ajustes">
-    <h4>✦ Ajustes rápidos</h4>
-    <p>En esta preview los controles son visuales. Se conectarán al launcher real en la siguiente etapa.</p>
-    <div class="ram-value"><span>Memoria para Minecraft</span><strong id="ramText">6 GB</strong></div>
-    <input id="ramRange" type="range" min="4" max="16" value="6" step="1" />
+  <aside id="settingsPanel" class="settings-panel settings-panel-v2" aria-label="Ajustes">
+    <div class="settings-header">
+      <div>
+        <span class="settings-kicker">✦ EMILAUNCHER</span>
+        <h4>Ajustes</h4>
+      </div>
+      <button id="settingsClose" class="mini-close" type="button" aria-label="Cerrar">×</button>
+    </div>
+
+    <section class="settings-section">
+      <div class="ram-value"><span>Memoria para Minecraft</span><strong id="ramText">6 GB</strong></div>
+      <input id="ramRange" type="range" min="2" max="32" value="6" step="1" />
+      <small>Se guarda automáticamente en este PC.</small>
+    </section>
+
+    <section class="settings-section">
+      <label for="gameDirectory">Carpeta de Emipokemon</label>
+      <div class="directory-row">
+        <input id="gameDirectory" type="text" placeholder="Usar carpeta recomendada" readonly />
+        <button id="chooseDirectory" class="small-action" type="button">Elegir</button>
+      </div>
+    </section>
+
+    <section class="settings-section toggles">
+      <label class="toggle-row">
+        <input id="autoCheckNews" type="checkbox" checked />
+        <span>Buscar noticias al abrir</span>
+      </label>
+      <label class="toggle-row">
+        <input id="closeLauncherOnGame" type="checkbox" />
+        <span>Cerrar launcher al iniciar Minecraft</span>
+      </label>
+    </section>
+
+    <section class="settings-section admin-tools">
+      <span class="settings-kicker">PARA EMI</span>
+      <p>Las noticias viven en GitHub. Editas el archivo, guardas el cambio y todos los launchers lo reciben automáticamente.</p>
+      <div class="settings-actions">
+        <button id="refreshNews" class="small-action" type="button">↻ Actualizar noticias</button>
+        <button id="editNews" class="small-action accent-action" type="button">✎ Editar noticias</button>
+      </div>
+    </section>
+
+    <div id="settingsSaved" class="settings-saved">✓ Ajustes guardados</div>
   </aside>
 
   <div id="toast" class="toast"></div>
