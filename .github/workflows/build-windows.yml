@@ -31,6 +31,6 @@ jobs:
       - name: Upload Windows launcher
         uses: actions/upload-artifact@v4
         with:
-          name: EmiLauncher-0.3.0-Windows
+          name: EmiLauncher-0.4.0-Windows
           path: dist/*.exe
           if-no-files-found: error
