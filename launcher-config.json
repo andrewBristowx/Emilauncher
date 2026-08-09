@@ -15,7 +15,8 @@
     "authority": "https://login.microsoftonline.com/consumers",
     "scopes": [
       "User.Read"
-    ]
+    ],
+    "note": "Public client: set the Application (client) ID here or publish microsoftClientId in remote/launcher.json. Never add a client secret to the desktop launcher."
   },
   "remote": {
     "news": "https://raw.githubusercontent.com/andrewBristowx/Emilauncher/main/remote/news.json",
