@@ -1,7 +1,7 @@
 {
   "name": "emilauncher",
-  "version": "0.1.0",
-  "description": "Launcher visual para Emipokemon / Cobbleverse",
+  "version": "0.2.0",
+  "description": "Launcher propio y actualizable para Emipokemon / Cobbleverse",
   "main": "src/main.js",
   "author": "Emi / Pony0n",
   "license": "UNLICENSED",
