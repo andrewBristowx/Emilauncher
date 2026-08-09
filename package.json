@@ -1,0 +1,38 @@
+{
+  "name": "emilauncher",
+  "version": "0.1.0",
+  "description": "Launcher visual para Emipokemon / Cobbleverse",
+  "main": "src/main.js",
+  "author": "Emi / Pony0n",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win portable --x64"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.emipokemon.launcher",
+    "productName": "EmiLauncher",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "launcher-config.json",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "artifactName": "EmiLauncher-${version}-Windows-${arch}.${ext}"
+    }
+  }
+}
