@@ -1,5 +1,5 @@
 {
-  "launcherVersion": "0.3.0-preview",
+  "launcherVersion": "0.4.0-preview",
   "packName": "Emipokemon",
   "minecraftVersion": "1.21.1",
   "loader": "Fabric",
@@ -9,6 +9,13 @@
   "community": {
     "discord": "https://discord.gg/s3XJZCp42",
     "twitch": "https://www.twitch.tv/emiilyextacy"
+  },
+  "microsoft": {
+    "clientId": "",
+    "authority": "https://login.microsoftonline.com/consumers",
+    "scopes": [
+      "User.Read"
+    ]
   },
   "remote": {
     "news": "https://raw.githubusercontent.com/andrewBristowx/Emilauncher/main/remote/news.json",
