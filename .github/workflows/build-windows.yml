@@ -1,0 +1,38 @@
+name: Build EmiLauncher Windows
+
+on:
+  push:
+    branches:
+      - main
+      - "agent/**"
+      - "feature/**"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build portable EXE
+        run: npm run dist
+
+      - name: Upload Windows launcher
+        uses: actions/upload-artifact@v4
+        with:
+          name: EmiLauncher-0.1.0-Windows
+          path: dist/*.exe
+          if-no-files-found: error
