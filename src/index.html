@@ -5,156 +5,218 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self';" />
   <title>EmiLauncher</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="v02.css" />
+  <link rel="stylesheet" href="v03.css" />
 </head>
 <body>
-  <main class="app-shell">
-    <section class="left-column">
-      <header class="topbar">
-        <div class="brand">
-          <div class="brand-orb pokeball-mark" aria-hidden="true"><span></span></div>
-          <div class="brand-copy">
-            <h1>EMILAUNCHER</h1>
-            <span>Emipokemon · Cobbleverse</span>
+  <div class="launcher-shell">
+    <aside class="sidebar">
+      <div class="brand-lockup">
+        <div class="emi-ball-logo" aria-label="Logo EmiLauncher">
+          <span class="ear ear-left"></span>
+          <span class="ear ear-right"></span>
+          <span class="antenna antenna-left"></span>
+          <span class="antenna antenna-right"></span>
+          <span class="ball-line"></span>
+          <span class="ball-button"></span>
+        </div>
+        <div class="brand-text">
+          <strong>EMILAUNCHER</strong>
+          <span>✦ EMIPOKEMON ✦</span>
+        </div>
+      </div>
+
+      <nav class="side-nav" aria-label="Navegación principal">
+        <button class="nav-button active" data-section="home"><span>⌂</span>Inicio</button>
+        <button class="nav-button" data-section="news"><span>✦</span>Noticias</button>
+        <button class="nav-button" data-section="modpack"><span>◇</span>Modpack</button>
+        <button class="nav-button" data-section="server"><span>▦</span>Servidores</button>
+        <button id="sidebarSettings" class="nav-button"><span>⚙</span>Ajustes</button>
+        <button class="nav-button" data-section="about"><span>ⓘ</span>Acerca de</button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="social-row">
+          <button id="discordButton" class="social-button discord" title="Discord">◉</button>
+          <button id="twitchButton" class="social-button twitch" title="Twitch">◈</button>
+        </div>
+        <span class="community-label">Únete a la comunidad ♡</span>
+        <img class="sidebar-chibi emi-chibi-data" alt="Emi chibi" draggable="false" />
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar-v3">
+        <div class="profile-card">
+          <div class="profile-avatar-wrap">
+            <img class="profile-avatar emi-chibi-data" alt="Avatar Emi" draggable="false" />
+            <span class="online-dot"></span>
+          </div>
+          <div>
+            <strong>Pony0n</strong>
+            <span>● En línea</span>
           </div>
         </div>
 
-        <div class="account-actions">
-          <button id="accountButton" class="account-button" type="button" aria-label="Cuenta Microsoft">
-            <span class="account-dot"></span>
-            <span class="account-copy">
-              <strong>Cuenta Microsoft</strong>
-              <small id="accountStatus">Iniciar sesión</small>
-            </span>
+        <div class="top-actions">
+          <button id="accountButton" class="account-button-v3" type="button">
+            <span class="microsoft-mark"><i></i><i></i><i></i><i></i></span>
+            <span><strong>Cuenta Microsoft</strong><small>Iniciar sesión</small></span>
           </button>
-          <button id="settingsButton" class="icon-button" type="button" aria-label="Ajustes" title="Ajustes">⚙</button>
+          <button id="settingsButton" class="settings-button-v3" type="button" aria-label="Ajustes">⚙</button>
         </div>
       </header>
 
-      <section class="welcome-panel">
-        <span class="eyebrow">✦ Tu aventura comienza aquí</span>
-        <h2><span class="gradient-text">Emipokemon</span><br />siempre actualizado.</h2>
-        <p>
-          Un launcher propio para instalar y mantener Cobbleverse, nuestros mods custom,
-          configuraciones y recursos sin depender de CurseForge.
-        </p>
+      <section class="dashboard-grid">
+        <div class="left-stack">
+          <section id="homeSection" class="hero-panel-v3 focus-section">
+            <div class="hero-glow hero-glow-one"></div>
+            <div class="hero-glow hero-glow-two"></div>
+            <div class="pixel-heart heart-one">♥</div>
+            <div class="pixel-heart heart-two">♥</div>
 
-        <div class="info-row">
-          <div class="info-chip">
-            <span>Minecraft</span>
-            <strong>1.21.1</strong>
+            <div class="hero-copy-v3">
+              <span class="hero-kicker">♡ TU AVENTURA COMIENZA AQUÍ ♡</span>
+              <h1>Emipokemon</h1>
+              <h2>Explora · Colecciona · Construye · Juega</h2>
+              <p>Minecraft con Cobbleverse, mods custom, sistemas únicos y una comunidad increíble.</p>
+
+              <div class="hero-tags">
+                <div><span class="tag-icon grass">▦</span><small>Minecraft</small><strong>1.21.1</strong></div>
+                <div><span class="tag-icon fabric">▧</span><small>Loader</small><strong>Fabric</strong></div>
+                <div><span class="tag-icon pack">◇</span><small>Pack</small><strong>Emipokemon</strong></div>
+              </div>
+            </div>
+
+            <img id="emiFullArt" class="emi-full-art" alt="Emi" draggable="false" />
+
+            <button id="playButton" class="play-button-v3" type="button">
+              <span>▶</span> JUGAR
+            </button>
+          </section>
+
+          <div class="lower-cards">
+            <section id="modpackSection" class="dashboard-card pack-status-card focus-section">
+              <div class="card-heading">
+                <div><span class="card-icon">◇</span><strong>Estado del Modpack</strong></div>
+                <span id="packVersion" class="version-chip">v1.0.0</span>
+              </div>
+              <div class="pack-status-body">
+                <div class="big-check">✓</div>
+                <div class="pack-state-copy">
+                  <strong id="packStatusTitle">Actualizado</strong>
+                  <span id="packStatusDetail">Comprobando archivos del pack...</span>
+                </div>
+              </div>
+              <div class="mini-progress"><div id="packProgressBar"></div></div>
+              <button id="viewPackChanges" class="secondary-button">Ver cambios</button>
+              <img class="status-chibi emi-chibi-data" alt="Emi chibi" draggable="false" />
+            </section>
+
+            <section id="serverSection" class="dashboard-card server-card focus-section">
+              <div class="card-heading">
+                <div><span class="signal-bars">▂▄▆█</span><strong>Servidor Principal</strong></div>
+                <span class="online-pill">● En línea</span>
+              </div>
+              <div class="server-content">
+                <div class="server-thumbnail"><span>✦</span><b>EMI</b></div>
+                <div class="server-info">
+                  <strong>Emipokemon · Cobbleverse</strong>
+                  <div class="server-address"><span id="serverAddress">Dirección por configurar</span><button id="copyServerButton">▣</button></div>
+                  <div class="server-meta"><span>♡ Comunidad Emi</span><span>Fabric 1.21.1</span></div>
+                </div>
+              </div>
+            </section>
           </div>
-          <div class="info-chip">
-            <span>Loader</span>
-            <strong>Fabric</strong>
-          </div>
-          <div class="info-chip">
-            <span>Pack remoto</span>
-            <strong id="packVersion">Consultando...</strong>
-          </div>
+        </div>
+
+        <div class="right-stack">
+          <section id="newsSection" class="dashboard-card news-panel-v3 focus-section">
+            <div class="news-title-row">
+              <div><span class="news-bell">♢</span><h2>Noticias y comunidad</h2></div>
+              <button id="refreshNewsTop" class="ghost-button">Actualizar</button>
+            </div>
+            <div id="newsGrid" class="news-list-v3">
+              <article class="featured-news loading-news">
+                <span class="news-tag">CARGANDO</span>
+                <h3>Conectando con las noticias de Emi...</h3>
+                <p>Buscando las últimas novedades.</p>
+              </article>
+            </div>
+            <img class="news-emotes" src="assets/emotes-collage.webp" alt="Emotes reales de Emi" draggable="false" />
+          </section>
+
+          <section class="dashboard-card resources-card">
+            <div class="card-heading compact"><div><span class="sun-icon">✦</span><strong>Recursos rápidos</strong></div></div>
+            <div class="resource-grid">
+              <button id="resourceDiscord" class="resource-button"><span>◉</span><b>Discord</b><small>Comunidad</small></button>
+              <button id="resourceTwitch" class="resource-button"><span>◈</span><b>Twitch</b><small>emiilyextacy</small></button>
+              <button id="resourceNews" class="resource-button"><span>✦</span><b>Noticias</b><small>Actualizar</small></button>
+              <button id="resourceFolder" class="resource-button"><span>▣</span><b>Carpeta</b><small>Emipokemon</small></button>
+              <button id="resourceSettings" class="resource-button"><span>⚙</span><b>Ajustes</b><small>Launcher</small></button>
+              <button id="resourceAbout" class="resource-button"><span>♡</span><b>Acerca de</b><small>v0.3</small></button>
+            </div>
+            <img class="resource-chibi emi-chibi-data" alt="Emi chibi" draggable="false" />
+          </section>
         </div>
       </section>
 
-      <section id="newsGrid" class="news-grid" aria-label="Noticias">
-        <article class="news-card loading-card">
-          <span class="tag">NOTICIAS</span>
-          <h3>Buscando novedades...</h3>
-          <p>Conectando con el canal oficial de EmiLauncher.</p>
-        </article>
-        <article class="news-card loading-card">
-          <span class="tag">EMI</span>
-          <h3>Contenido remoto</h3>
-          <p>Las noticias nuevas aparecerán aquí sin reinstalar el launcher.</p>
-        </article>
-      </section>
-
-      <section class="launch-area">
-        <div class="launch-card">
-          <button id="playButton" class="play-button" type="button">▶ JUGAR</button>
-          <div class="launch-meta">
-            <strong>Cobbleverse · Emipokemon</strong>
-            <span class="server-online">● Servidor preparado</span>
-            <span id="launchSubtext">Fabric 1.21.1 · Preparando sistemas reales</span>
+      <footer class="bottom-status-bar">
+        <div class="startup-status">
+          <div class="startup-header"><strong>Progreso de inicio</strong><span id="updateText">Verificando...</span></div>
+          <div class="startup-track"><div id="progressBar"></div></div>
+          <div class="startup-steps">
+            <span id="javaStep">✓ Java 21</span>
+            <span id="modpackStep">✓ Modpack</span>
+            <span id="configStep">✓ Configuraciones</span>
+            <span id="resourcesStep">✓ Recursos</span>
           </div>
         </div>
 
-        <div class="update-card">
-          <div class="label-row">
-            <span>Actualizador</span>
-            <span id="updateText">Comprobando...</span>
-          </div>
-          <div class="progress-track"><div class="progress-bar"></div></div>
-          <small id="updateDetail">Consultando versión del launcher, pack y noticias.</small>
+        <div class="ram-control">
+          <div><strong>Memoria RAM</strong><span id="ramText">6 GB</span></div>
+          <input id="ramRange" type="range" min="4" max="16" value="6" step="1" />
+          <div class="ram-labels"><span>4GB</span><span>8GB</span><span>12GB</span><span>16GB</span></div>
         </div>
-      </section>
-    </section>
 
-    <aside class="hero-card" aria-label="Decoración Emipokemon">
-      <div class="hero-top">
-        <span class="preview-pill">PREVIEW FUNCIONAL</span>
-        <span id="versionPill" class="version-pill">v0.2.0</span>
-      </div>
+        <button id="chooseDirectory" class="folder-button"><span>▰</span> Abrir carpeta</button>
+      </footer>
+    </main>
+  </div>
 
-      <div class="emote-stage" aria-label="Emotes de Emi">
-        <div class="hero-pokeball" aria-hidden="true"><span></span></div>
-        <img class="emote-collage emote-collage-v2" src="assets/emotes-collage.webp" alt="Emotes de Emi" draggable="false" />
-      </div>
-
-      <div class="hero-copy">
-        <strong>♡ Noticias y actualizaciones de Emi</strong>
-        <span id="newsFreshness">El launcher comprueba contenido remoto al abrirse.</span>
-      </div>
-    </aside>
-  </main>
-
-  <aside id="settingsPanel" class="settings-panel settings-panel-v2" aria-label="Ajustes">
-    <div class="settings-header">
-      <div>
-        <span class="settings-kicker">✦ EMILAUNCHER</span>
-        <h4>Ajustes</h4>
-      </div>
-      <button id="settingsClose" class="mini-close" type="button" aria-label="Cerrar">×</button>
+  <aside id="settingsPanel" class="settings-panel-v3" aria-label="Ajustes">
+    <div class="settings-header-v3">
+      <div><span>✦ EMILAUNCHER</span><h3>Ajustes</h3></div>
+      <button id="closeSettings" class="mini-close">×</button>
     </div>
 
-    <section class="settings-section">
-      <div class="ram-value"><span>Memoria para Minecraft</span><strong id="ramText">6 GB</strong></div>
-      <input id="ramRange" type="range" min="2" max="32" value="6" step="1" />
-      <small>Se guarda automáticamente en este PC.</small>
+    <section class="settings-block">
+      <label>Carpeta de Emipokemon</label>
+      <div class="directory-row-v3">
+        <input id="gameDirectory" readonly value="Sin seleccionar" />
+        <button id="chooseDirectorySettings">Elegir</button>
+      </div>
+      <small>Mods, configuraciones, recursos y futuras actualizaciones se instalarán aquí.</small>
     </section>
 
-    <section class="settings-section">
-      <label for="gameDirectory">Carpeta de Emipokemon</label>
-      <div class="directory-row">
-        <input id="gameDirectory" type="text" placeholder="Usar carpeta recomendada" readonly />
-        <button id="chooseDirectory" class="small-action" type="button">Elegir</button>
+    <section class="settings-block">
+      <label class="toggle-row-v3"><input id="autoCheckNews" type="checkbox" checked /><span>Actualizar noticias automáticamente</span></label>
+      <label class="toggle-row-v3"><input id="closeLauncherOnGame" type="checkbox" /><span>Cerrar launcher al iniciar Minecraft</span></label>
+    </section>
+
+    <section class="settings-block admin-block">
+      <span class="admin-kicker">PARA EMI</span>
+      <h4>Publicación rápida</h4>
+      <p>Las noticias se publican desde GitHub y aparecen para todos sin volver a descargar el launcher.</p>
+      <div class="settings-actions-v3">
+        <button id="refreshNews">↻ Actualizar noticias</button>
+        <button id="editNews">✎ Editar noticias</button>
       </div>
     </section>
 
-    <section class="settings-section toggles">
-      <label class="toggle-row">
-        <input id="autoCheckNews" type="checkbox" checked />
-        <span>Buscar noticias al abrir</span>
-      </label>
-      <label class="toggle-row">
-        <input id="closeLauncherOnGame" type="checkbox" />
-        <span>Cerrar launcher al iniciar Minecraft</span>
-      </label>
-    </section>
-
-    <section class="settings-section admin-tools">
-      <span class="settings-kicker">PARA EMI</span>
-      <p>Las noticias viven en GitHub. Editas el archivo, guardas el cambio y todos los launchers lo reciben automáticamente.</p>
-      <div class="settings-actions">
-        <button id="refreshNews" class="small-action" type="button">↻ Actualizar noticias</button>
-        <button id="editNews" class="small-action accent-action" type="button">✎ Editar noticias</button>
-      </div>
-    </section>
-
-    <div id="settingsSaved" class="settings-saved">✓ Ajustes guardados</div>
+    <div id="settingsSaved" class="settings-saved-v3">✓ Ajustes guardados</div>
   </aside>
 
-  <div id="toast" class="toast"></div>
+  <div id="toast" class="toast-v3"></div>
   <script src="renderer.js"></script>
 </body>
 </html>
