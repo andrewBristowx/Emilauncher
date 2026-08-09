@@ -1,246 +1,329 @@
-const progressBar = document.querySelector('.progress-bar');
-const updateText = document.querySelector('#updateText');
-const updateDetail = document.querySelector('#updateDetail');
-const playButton = document.querySelector('#playButton');
-const toast = document.querySelector('#toast');
-const settingsButton = document.querySelector('#settingsButton');
-const settingsClose = document.querySelector('#settingsClose');
-const settingsPanel = document.querySelector('#settingsPanel');
-const ramRange = document.querySelector('#ramRange');
-const ramText = document.querySelector('#ramText');
-const gameDirectory = document.querySelector('#gameDirectory');
-const chooseDirectory = document.querySelector('#chooseDirectory');
-const autoCheckNews = document.querySelector('#autoCheckNews');
-const closeLauncherOnGame = document.querySelector('#closeLauncherOnGame');
-const settingsSaved = document.querySelector('#settingsSaved');
-const refreshNewsButton = document.querySelector('#refreshNews');
-const editNewsButton = document.querySelector('#editNews');
-const accountButton = document.querySelector('#accountButton');
-const accountStatus = document.querySelector('#accountStatus');
-const newsGrid = document.querySelector('#newsGrid');
-const newsFreshness = document.querySelector('#newsFreshness');
-const packVersion = document.querySelector('#packVersion');
-const versionPill = document.querySelector('#versionPill');
+const CURRENT_VERSION = '0.3.0-preview';
+const DISCORD_URL = 'https://discord.gg/s3XJZCp42';
+const TWITCH_URL = 'https://www.twitch.tv/emiilyextacy';
 
-const CURRENT_VERSION = '0.2.0-preview';
-let settings = null;
-let saveTimer = null;
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => [...document.querySelectorAll(selector)];
+
+const playButton = $('#playButton');
+const accountButton = $('#accountButton');
+const settingsButton = $('#settingsButton');
+const sidebarSettings = $('#sidebarSettings');
+const settingsPanel = $('#settingsPanel');
+const closeSettings = $('#closeSettings');
+const toast = $('#toast');
+const newsGrid = $('#newsGrid');
+const progressBar = $('#progressBar');
+const packProgressBar = $('#packProgressBar');
+const updateText = $('#updateText');
+const packStatusTitle = $('#packStatusTitle');
+const packStatusDetail = $('#packStatusDetail');
+const packVersion = $('#packVersion');
+const ramRange = $('#ramRange');
+const ramText = $('#ramText');
+const gameDirectory = $('#gameDirectory');
+const chooseDirectory = $('#chooseDirectory');
+const chooseDirectorySettings = $('#chooseDirectorySettings');
+const autoCheckNews = $('#autoCheckNews');
+const closeLauncherOnGame = $('#closeLauncherOnGame');
+const settingsSaved = $('#settingsSaved');
+const serverAddress = $('#serverAddress');
+
+let saveTimer;
+let settings = {
+  ramGb: 6,
+  gameDirectory: '',
+  autoCheckNews: true,
+  closeLauncherOnGame: false
+};
 
 function showToast(message) {
   toast.textContent = message;
   toast.classList.add('show');
   window.clearTimeout(showToast.timeout);
-  showToast.timeout = window.setTimeout(() => toast.classList.remove('show'), 3000);
+  showToast.timeout = window.setTimeout(() => toast.classList.remove('show'), 2900);
 }
 
-function setProgress(value, label, detail) {
-  const safe = Math.max(0, Math.min(100, value));
-  progressBar.style.width = `${safe}%`;
-  updateText.textContent = label;
-  if (detail) updateDetail.textContent = detail;
+function showSaved() {
+  settingsSaved.classList.add('show');
+  window.clearTimeout(showSaved.timeout);
+  showSaved.timeout = window.setTimeout(() => settingsSaved.classList.remove('show'), 1300);
 }
 
-function flashSaved() {
-  settingsSaved.classList.add('visible');
-  window.clearTimeout(flashSaved.timeout);
-  flashSaved.timeout = window.setTimeout(() => settingsSaved.classList.remove('visible'), 1200);
+function openSettings() {
+  settingsPanel.classList.add('open');
 }
 
-async function saveSettings(patch) {
-  if (!window.emiApi) return;
-  settings = await window.emiApi.saveSettings(patch);
-  applySettings(settings);
-  flashSaved();
+function closeSettingsPanel() {
+  settingsPanel.classList.remove('open');
 }
 
-function queueSettingsSave(patch) {
-  window.clearTimeout(saveTimer);
-  saveTimer = window.setTimeout(() => saveSettings(patch), 180);
-}
-
-function applySettings(next) {
-  settings = next;
-  ramRange.value = String(next.ramGb ?? 6);
+function updateSettingsUi() {
+  ramRange.value = String(settings.ramGb || 6);
   ramText.textContent = `${ramRange.value} GB`;
-  gameDirectory.value = next.gameDirectory || '';
-  autoCheckNews.checked = Boolean(next.autoCheckNews);
-  closeLauncherOnGame.checked = Boolean(next.closeLauncherOnGame);
+  gameDirectory.value = settings.gameDirectory || 'Sin seleccionar';
+  autoCheckNews.checked = settings.autoCheckNews !== false;
+  closeLauncherOnGame.checked = Boolean(settings.closeLauncherOnGame);
 }
 
-function formatRemoteDate(value) {
-  if (!value) return 'Contenido remoto activo';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return 'Contenido remoto activo';
-  return `Actualizado ${date.toLocaleString('es-PE', { dateStyle: 'medium', timeStyle: 'short' })}`;
+function queueSave(patch) {
+  settings = { ...settings, ...patch };
+  window.clearTimeout(saveTimer);
+  saveTimer = window.setTimeout(async () => {
+    try {
+      settings = await window.emiApi.saveSettings(patch);
+      updateSettingsUi();
+      showSaved();
+    } catch (error) {
+      console.error(error);
+      showToast('No se pudieron guardar los ajustes.');
+    }
+  }, 160);
 }
 
-function renderNews(payload) {
-  const items = Array.isArray(payload?.news) ? payload.news.slice(0, 2) : [];
-  if (items.length === 0) throw new Error('No hay noticias publicadas');
-
-  newsGrid.replaceChildren();
-
-  for (const item of items) {
-    const article = document.createElement('article');
-    article.className = 'news-card';
-
-    const tag = document.createElement('span');
-    tag.className = 'tag';
-    tag.textContent = String(item.tag || 'NUEVO').toUpperCase().slice(0, 18);
-
-    const title = document.createElement('h3');
-    title.textContent = String(item.title || 'Noticia de Emi').slice(0, 90);
-
-    const body = document.createElement('p');
-    body.textContent = String(item.body || '').slice(0, 320);
-
-    article.append(tag, title, body);
-    newsGrid.append(article);
-  }
-
-  newsFreshness.textContent = formatRemoteDate(payload.updatedAt);
-}
-
-function renderNewsOffline() {
-  newsGrid.innerHTML = '';
-  const fallbacks = [
-    ['OFFLINE', 'No se pudieron actualizar las noticias', 'El launcher seguirá funcionando y volverá a intentarlo cuando tengas conexión.'],
-    ['EMI', 'Canal de noticias preparado', 'Emi puede publicar desde GitHub y el cambio aparecerá aquí sin reinstalar el launcher.']
-  ];
-
-  for (const [tagText, titleText, bodyText] of fallbacks) {
-    const article = document.createElement('article');
-    article.className = 'news-card';
-    const tag = document.createElement('span');
-    tag.className = 'tag';
-    tag.textContent = tagText;
-    const title = document.createElement('h3');
-    title.textContent = titleText;
-    const body = document.createElement('p');
-    body.textContent = bodyText;
-    article.append(tag, title, body);
-    newsGrid.append(article);
-  }
-}
-
-async function refreshNews(silent = false) {
-  if (!window.emiApi) return false;
-  if (!silent) setProgress(24, 'Noticias...', 'Descargando las noticias publicadas por Emi.');
-
+async function chooseGameDirectory() {
   try {
-    const payload = await window.emiApi.getRemoteNews();
-    renderNews(payload);
-    if (!silent) showToast('✦ Noticias actualizadas.');
-    return true;
+    const selected = await window.emiApi.chooseGameDirectory();
+    if (!selected) return;
+    settings = selected;
+    updateSettingsUi();
+    showSaved();
+    showToast('✦ Carpeta de Emipokemon actualizada.');
   } catch (error) {
-    console.warn('No se pudieron cargar noticias remotas:', error);
-    renderNewsOffline();
-    newsFreshness.textContent = 'Sin conexión con el canal remoto';
-    if (!silent) showToast('No se pudieron actualizar las noticias.');
-    return false;
+    console.error(error);
+    showToast('No se pudo elegir la carpeta.');
+  }
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function prettyDate(value) {
+  if (!value) return '';
+  try {
+    return new Intl.DateTimeFormat('es-PE', { day: '2-digit', month: 'short', year: 'numeric' })
+      .format(new Date(`${value}T12:00:00`));
+  } catch {
+    return value;
+  }
+}
+
+function renderNews(items) {
+  if (!Array.isArray(items) || items.length === 0) {
+    newsGrid.innerHTML = `
+      <article class="featured-news">
+        <span class="news-tag">EMI</span>
+        <h3>Sin noticias nuevas</h3>
+        <p>Cuando Emi publique una novedad aparecerá automáticamente aquí.</p>
+      </article>`;
+    return;
+  }
+
+  newsGrid.innerHTML = items.slice(0, 3).map((item, index) => {
+    const className = index === 0 ? 'featured-news' : 'compact-news';
+    const tag = index === 0 ? `<span class="news-tag">${escapeHtml(item.tag || 'NUEVO')}</span>` : '';
+    return `
+      <article class="${className}">
+        ${tag}
+        <span class="news-date">${escapeHtml(prettyDate(item.date))}</span>
+        <h3>${escapeHtml(item.title || 'Noticia')}</h3>
+        <p>${escapeHtml(item.body || '')}</p>
+      </article>`;
+  }).join('');
+}
+
+async function refreshNews(showMessage = false) {
+  try {
+    const feed = await window.emiApi.getRemoteNews();
+    renderNews(feed?.news || []);
+    if (showMessage) showToast('✦ Noticias actualizadas para EmiLauncher.');
+  } catch (error) {
+    console.error(error);
+    if (showMessage) showToast('No se pudieron actualizar las noticias.');
   }
 }
 
 async function checkRemoteState() {
-  if (!window.emiApi) {
-    setProgress(100, 'Modo local', 'La API segura del launcher no está disponible.');
-    return;
-  }
+  let progress = 12;
+  progressBar.style.width = `${progress}%`;
+  packProgressBar.style.width = `${progress}%`;
 
-  setProgress(10, 'Comprobando...', 'Leyendo tus ajustes guardados.');
-
-  try {
-    applySettings(await window.emiApi.getSettings());
-  } catch (error) {
-    console.warn('No se pudieron leer ajustes:', error);
-  }
-
-  let completed = 1;
-  const total = 3;
-  const bump = (label, detail) => {
-    completed += 1;
-    setProgress(Math.round((completed / total) * 100), label, detail);
-  };
-
-  if (settings?.autoCheckNews !== false) {
-    await refreshNews(true);
-  } else {
-    renderNewsOffline();
-    newsFreshness.textContent = 'Noticias automáticas desactivadas en Ajustes';
-  }
-  bump('Pack...', 'Consultando la versión publicada del modpack.');
+  const pulse = window.setInterval(() => {
+    progress = Math.min(progress + 8 + Math.floor(Math.random() * 10), 92);
+    progressBar.style.width = `${progress}%`;
+    packProgressBar.style.width = `${progress}%`;
+    updateText.textContent = `Verificando... ${progress}%`;
+  }, 220);
 
   try {
-    const pack = await window.emiApi.getRemotePack();
-    packVersion.textContent = pack?.version || 'Preview';
-  } catch (error) {
-    console.warn('No se pudo leer el manifiesto del pack:', error);
-    packVersion.textContent = 'Sin conexión';
-  }
+    const [launcher, pack] = await Promise.all([
+      window.emiApi.getRemoteLauncher().catch(() => null),
+      window.emiApi.getRemotePack().catch(() => null)
+    ]);
 
-  bump('Launcher...', 'Comprobando si existe una versión nueva de EmiLauncher.');
-
-  try {
-    const remoteLauncher = await window.emiApi.getRemoteLauncher();
-    const latest = remoteLauncher?.latestVersion || CURRENT_VERSION;
-    versionPill.textContent = `v${CURRENT_VERSION.replace('-preview', '')}`;
-
-    if (latest !== CURRENT_VERSION) {
-      setProgress(100, 'Actualización disponible', `Nueva versión del launcher: ${latest}`);
-      showToast(`✦ Hay una versión nueva de EmiLauncher: ${latest}`);
+    if (pack) {
+      const version = pack.version || pack.packVersion || '1.0.0';
+      packVersion.textContent = `v${version}`;
+      packStatusTitle.textContent = 'Actualizado';
+      packStatusDetail.textContent = 'El manifiesto remoto está disponible.';
     } else {
-      setProgress(100, 'Todo listo', 'Noticias, pack y launcher comprobados correctamente.');
+      packStatusTitle.textContent = 'Modo sin conexión';
+      packStatusDetail.textContent = 'Se usará la instalación local disponible.';
     }
+
+    if (launcher?.version && launcher.version !== CURRENT_VERSION) {
+      showToast(`Hay una versión de EmiLauncher disponible: ${launcher.version}`);
+    }
+  } finally {
+    window.clearInterval(pulse);
+    progressBar.style.width = '100%';
+    packProgressBar.style.width = '100%';
+    updateText.textContent = '♡ Listo para jugar';
+  }
+}
+
+async function readTextAsset(path) {
+  const response = await fetch(path);
+  if (!response.ok) throw new Error(`No se pudo leer ${path}`);
+  return (await response.text()).trim();
+}
+
+async function loadArtwork() {
+  try {
+    const chibiBase64 = await readTextAsset('assets/emi-chibi.webp.b64.txt');
+    const chibiSrc = `data:image/webp;base64,${chibiBase64}`;
+    $$('.emi-chibi-data').forEach((image) => { image.src = chibiSrc; });
   } catch (error) {
-    console.warn('No se pudo comprobar la versión del launcher:', error);
-    setProgress(100, 'Listo sin conexión', 'Puedes usar el launcher; la comprobación remota falló.');
+    console.warn('No se pudo cargar el chibi de Emi:', error);
+  }
+
+  try {
+    const parts = await Promise.all([0, 1, 2, 3, 4, 5].map((index) => readTextAsset(`assets/emi-full-${index}.b64`)));
+    $('#emiFullArt').src = `data:image/webp;base64,${parts.join('')}`;
+  } catch (error) {
+    console.warn('No se pudo cargar el modelo grande de Emi:', error);
+    $('#emiFullArt').style.display = 'none';
+  }
+}
+
+function flashSection(selector) {
+  const section = $(selector);
+  if (!section) return;
+  section.classList.remove('flash');
+  void section.offsetWidth;
+  section.classList.add('flash');
+}
+
+function setActiveNav(button) {
+  $$('.nav-button').forEach((item) => item.classList.remove('active'));
+  if (button) button.classList.add('active');
+}
+
+async function openExternal(url) {
+  try {
+    await window.emiApi.openExternal(url);
+  } catch (error) {
+    console.error(error);
+    showToast('No se pudo abrir el enlace.');
   }
 }
 
 playButton.addEventListener('click', () => {
-  showToast('✦ Ajustes y noticias ya son reales. El arranque de Minecraft será el siguiente sistema en conectarse.');
+  showToast('✦ El diseño ya está listo. El arranque real de Minecraft se conecta en la siguiente etapa.');
 });
 
 accountButton.addEventListener('click', () => {
-  accountStatus.textContent = 'Pendiente de vincular';
-  showToast('Cuenta Microsoft: falta registrar la aplicación de EmiLauncher para activar el inicio de sesión seguro.');
+  showToast('Cuenta Microsoft: falta registrar el Client ID oficial de EmiLauncher para activar el inicio de sesión.');
 });
 
-settingsButton.addEventListener('click', () => {
-  settingsPanel.classList.toggle('open');
-});
+settingsButton.addEventListener('click', openSettings);
+sidebarSettings.addEventListener('click', () => { setActiveNav(sidebarSettings); openSettings(); });
+closeSettings.addEventListener('click', closeSettingsPanel);
 
-settingsClose.addEventListener('click', () => settingsPanel.classList.remove('open'));
+$$('.nav-button[data-section]').forEach((button) => {
+  button.addEventListener('click', () => {
+    setActiveNav(button);
+    const section = button.dataset.section;
+    if (section === 'home') flashSection('#homeSection');
+    if (section === 'news') flashSection('#newsSection');
+    if (section === 'modpack') flashSection('#modpackSection');
+    if (section === 'server') flashSection('#serverSection');
+    if (section === 'about') showToast('EmiLauncher 0.3.0 · Hecho para Emipokemon ♡');
+  });
+});
 
 ramRange.addEventListener('input', () => {
   ramText.textContent = `${ramRange.value} GB`;
-  queueSettingsSave({ ramGb: Number(ramRange.value) });
+  queueSave({ ramGb: Number(ramRange.value) });
 });
 
-chooseDirectory.addEventListener('click', async () => {
+autoCheckNews.addEventListener('change', () => queueSave({ autoCheckNews: autoCheckNews.checked }));
+closeLauncherOnGame.addEventListener('change', () => queueSave({ closeLauncherOnGame: closeLauncherOnGame.checked }));
+
+chooseDirectory.addEventListener('click', chooseGameDirectory);
+chooseDirectorySettings.addEventListener('click', chooseGameDirectory);
+$('#resourceFolder').addEventListener('click', chooseGameDirectory);
+
+$('#refreshNews').addEventListener('click', () => refreshNews(true));
+$('#refreshNewsTop').addEventListener('click', () => refreshNews(true));
+$('#resourceNews').addEventListener('click', () => refreshNews(true));
+
+$('#editNews').addEventListener('click', async () => {
+  await window.emiApi.openNewsEditor();
+  showToast('✦ Se abrió GitHub. Guarda la noticia en main y aparecerá para todos.');
+});
+
+$('#discordButton').addEventListener('click', () => openExternal(DISCORD_URL));
+$('#resourceDiscord').addEventListener('click', () => openExternal(DISCORD_URL));
+$('#twitchButton').addEventListener('click', () => openExternal(TWITCH_URL));
+$('#resourceTwitch').addEventListener('click', () => openExternal(TWITCH_URL));
+$('#resourceSettings').addEventListener('click', openSettings);
+$('#resourceAbout').addEventListener('click', () => showToast('♡ EmiLauncher · Emipokemon · Cobbleverse'));
+
+$('#viewPackChanges').addEventListener('click', () => showToast('El historial de cambios se conectará al manifiesto del modpack.'));
+
+$('#copyServerButton').addEventListener('click', async () => {
+  const address = serverAddress.textContent.trim();
+  if (!address || address.includes('configurar')) {
+    showToast('Todavía falta configurar la IP/dominio público del servidor.');
+    return;
+  }
   try {
-    const next = await window.emiApi.chooseGameDirectory();
-    applySettings(next);
-    flashSaved();
-  } catch (error) {
-    console.warn(error);
-    showToast('No se pudo cambiar la carpeta.');
+    await navigator.clipboard.writeText(address);
+    showToast('✓ IP copiada.');
+  } catch {
+    showToast(`IP: ${address}`);
   }
 });
 
-autoCheckNews.addEventListener('change', () => saveSettings({ autoCheckNews: autoCheckNews.checked }));
-closeLauncherOnGame.addEventListener('change', () => saveSettings({ closeLauncherOnGame: closeLauncherOnGame.checked }));
-
-refreshNewsButton.addEventListener('click', () => refreshNews(false));
-editNewsButton.addEventListener('click', async () => {
-  await window.emiApi.openNewsEditor();
-  showToast('✦ Abriendo el editor de noticias en GitHub.');
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') closeSettingsPanel();
 });
 
 document.addEventListener('click', (event) => {
-  if (!settingsPanel.contains(event.target) && !settingsButton.contains(event.target)) {
-    settingsPanel.classList.remove('open');
-  }
+  if (!settingsPanel.classList.contains('open')) return;
+  if (settingsPanel.contains(event.target) || settingsButton.contains(event.target) || sidebarSettings.contains(event.target) || $('#resourceSettings').contains(event.target)) return;
+  closeSettingsPanel();
 });
 
-checkRemoteState();
+(async function boot() {
+  await loadArtwork();
+
+  try {
+    settings = { ...settings, ...(await window.emiApi.getSettings()) };
+  } catch (error) {
+    console.warn('No se pudieron leer los ajustes locales:', error);
+  }
+  updateSettingsUi();
+
+  if (settings.autoCheckNews !== false) await refreshNews(false);
+  else renderNews([]);
+
+  await checkRemoteState();
+})();

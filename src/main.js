@@ -52,10 +52,7 @@ async function fetchJson(url) {
     }
   });
 
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
-  }
-
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return response.json();
 }
 
@@ -75,10 +72,7 @@ function registerIpc() {
       defaultPath: current.gameDirectory || app.getPath('appData')
     });
 
-    if (result.canceled || result.filePaths.length === 0) {
-      return current;
-    }
-
+    if (result.canceled || result.filePaths.length === 0) return current;
     return writeSettings({ ...current, gameDirectory: result.filePaths[0] });
   });
 
@@ -90,20 +84,19 @@ function registerIpc() {
 
   ipcMain.handle('external:open', (_event, url) => {
     if (typeof url !== 'string') return false;
-    if (!/^https:\/\/(github\.com|discord\.gg|discord\.com|modrinth\.com)\//i.test(url)) {
-      return false;
-    }
+    const allowed = /^https:\/\/(github\.com|discord\.gg|discord\.com|twitch\.tv|www\.twitch\.tv|modrinth\.com)\//i;
+    if (!allowed.test(url)) return false;
     return shell.openExternal(url);
   });
 }
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1280,
-    height: 760,
-    minWidth: 1060,
-    minHeight: 660,
-    backgroundColor: '#120a18',
+    width: 1440,
+    height: 860,
+    minWidth: 1120,
+    minHeight: 700,
+    backgroundColor: '#0a0611',
     autoHideMenuBar: true,
     title: 'EmiLauncher',
     webPreferences: {
