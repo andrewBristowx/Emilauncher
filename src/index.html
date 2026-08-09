@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self';" />
+  <title>EmiLauncher</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="left-column">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-orb">✦</div>
+          <div class="brand-copy">
+            <h1>EMILAUNCHER</h1>
+            <span>Emipokemon · Cobbleverse</span>
+          </div>
+        </div>
+
+        <div>
+          <button class="account-button" type="button" aria-label="Cuenta Microsoft">
+            <span class="account-dot"></span>
+            <span class="account-copy">
+              <strong>Cuenta Microsoft</strong>
+              <small>Iniciar sesión</small>
+            </span>
+          </button>
+          <button id="settingsButton" class="icon-button" type="button" aria-label="Ajustes">⚙</button>
+        </div>
+      </header>
+
+      <section class="welcome-panel">
+        <span class="eyebrow">✦ Tu aventura comienza aquí</span>
+        <h2><span class="gradient-text">Emipokemon</span><br />siempre actualizado.</h2>
+        <p>
+          Un launcher propio para instalar y mantener Cobbleverse, nuestros mods custom,
+          configuraciones y recursos sin depender de CurseForge.
+        </p>
+
+        <div class="info-row">
+          <div class="info-chip">
+            <span>Minecraft</span>
+            <strong>1.21.1</strong>
+          </div>
+          <div class="info-chip">
+            <span>Loader</span>
+            <strong>Fabric</strong>
+          </div>
+          <div class="info-chip">
+            <span>Pack</span>
+            <strong>Emipokemon Preview</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="news-grid" aria-label="Noticias">
+        <article class="news-card">
+          <span class="tag">NUEVO</span>
+          <h3>Launcher propio en desarrollo</h3>
+          <p>La primera versión define la identidad visual. Después conectaremos Microsoft, actualizaciones y el arranque real de Minecraft.</p>
+        </article>
+        <article class="news-card">
+          <span class="tag">SERVIDOR</span>
+          <h3>Cobbleverse + sistemas de Emi</h3>
+          <p>Gacha, protecciones, eventos y futuros mods podrán actualizarse desde una sola instalación.</p>
+        </article>
+      </section>
+
+      <section class="launch-area">
+        <div class="launch-card">
+          <button id="playButton" class="play-button" type="button">▶ JUGAR</button>
+          <div class="launch-meta">
+            <strong>Cobbleverse · Emipokemon</strong>
+            <span class="server-online">● Servidor preparado</span>
+            <span>Fabric 1.21.1 · Preview visual</span>
+          </div>
+        </div>
+
+        <div class="update-card">
+          <div class="label-row">
+            <span>Actualizador</span>
+            <span id="updateText">Verificando...</span>
+          </div>
+          <div class="progress-track"><div class="progress-bar"></div></div>
+          <small>Comparando versión y archivos del pack</small>
+        </div>
+      </section>
+    </section>
+
+    <aside class="hero-card" aria-label="Decoración Emipokemon">
+      <div class="hero-top">
+        <span class="preview-pill">PREVIEW VISUAL</span>
+        <span class="version-pill">v0.1.0</span>
+      </div>
+
+      <img class="emote-collage" src="assets/emotes-collage.webp" alt="Emotes de Emi" draggable="false" />
+
+      <div class="hero-copy">
+        <strong>♡ Hecho para la comunidad de Emi</strong>
+        <span>Rosa, morado y los emotes formarán la identidad común del launcher y de nuestros GUIs custom.</span>
+      </div>
+    </aside>
+  </main>
+
+  <aside id="settingsPanel" class="settings-panel" aria-label="Ajustes">
+    <h4>✦ Ajustes rápidos</h4>
+    <p>En esta preview los controles son visuales. Se conectarán al launcher real en la siguiente etapa.</p>
+    <div class="ram-value"><span>Memoria para Minecraft</span><strong id="ramText">6 GB</strong></div>
+    <input id="ramRange" type="range" min="4" max="16" value="6" step="1" />
+  </aside>
+
+  <div id="toast" class="toast"></div>
+  <script src="renderer.js"></script>
+</body>
+</html>
