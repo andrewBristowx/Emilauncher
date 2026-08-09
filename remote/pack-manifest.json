@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "pack": "Emipokemon",
+  "channel": "preview",
+  "version": "0.1.0-preview",
+  "minecraft": "1.21.1",
+  "loader": "Fabric",
+  "files": [],
+  "notes": "El actualizador real del modpack usará este manifiesto. Cada archivo tendrá ruta, URL, hash SHA-256 y política de actualización."
+}
