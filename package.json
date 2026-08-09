@@ -1,6 +1,6 @@
 {
   "name": "emilauncher",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Launcher propio y actualizable para Emipokemon / Cobbleverse",
   "main": "src/main.js",
   "author": "Emi / Pony0n",
@@ -9,6 +9,9 @@
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder --win portable --x64"
+  },
+  "dependencies": {
+    "@azure/msal-node": "5.4.3"
   },
   "devDependencies": {
     "electron": "^31.7.7",

@@ -8,5 +8,15 @@ contextBridge.exposeInMainWorld('emiApi', {
   getRemoteLauncher: () => ipcRenderer.invoke('remote:getLauncher'),
   getRemotePack: () => ipcRenderer.invoke('remote:getPack'),
   openNewsEditor: () => ipcRenderer.invoke('external:openNewsEditor'),
-  openExternal: (url) => ipcRenderer.invoke('external:open', url)
+  openExternal: (url) => ipcRenderer.invoke('external:open', url),
+
+  getMicrosoftStatus: () => ipcRenderer.invoke('auth:microsoft:status'),
+  loginMicrosoft: () => ipcRenderer.invoke('auth:microsoft:login'),
+  logoutMicrosoft: () => ipcRenderer.invoke('auth:microsoft:logout'),
+  openMicrosoftVerification: (url) => ipcRenderer.invoke('auth:microsoft:openVerification', url),
+  onMicrosoftDeviceCode: (callback) => {
+    const listener = (_event, payload) => callback(payload);
+    ipcRenderer.on('auth:microsoft:deviceCode', listener);
+    return () => ipcRenderer.removeListener('auth:microsoft:deviceCode', listener);
+  }
 });

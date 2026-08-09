@@ -1,6 +1,7 @@
 const { app, BrowserWindow, dialog, ipcMain, shell } = require('electron');
 const fs = require('fs');
 const path = require('path');
+const { PublicClientApplication } = require('@azure/msal-node');
 
 const REMOTE_URLS = {
   news: 'https://raw.githubusercontent.com/andrewBristowx/Emilauncher/main/remote/news.json',
@@ -9,6 +10,8 @@ const REMOTE_URLS = {
 };
 
 const NEWS_EDITOR_URL = 'https://github.com/andrewBristowx/Emilauncher/edit/main/remote/news.json';
+const MICROSOFT_AUTHORITY = 'https://login.microsoftonline.com/consumers';
+const MICROSOFT_SCOPES = ['User.Read'];
 
 const DEFAULT_SETTINGS = {
   ramGb: 6,
@@ -17,8 +20,29 @@ const DEFAULT_SETTINGS = {
   closeLauncherOnGame: false
 };
 
+let mainWindow = null;
+let microsoftClient = null;
+let microsoftClientId = '';
+let authInProgress = null;
+
+function launcherConfigPath() {
+  return path.join(__dirname, '..', 'launcher-config.json');
+}
+
+function readLauncherConfig() {
+  try {
+    return JSON.parse(fs.readFileSync(launcherConfigPath(), 'utf8'));
+  } catch {
+    return {};
+  }
+}
+
 function settingsFile() {
   return path.join(app.getPath('userData'), 'settings.json');
+}
+
+function authCacheFile() {
+  return path.join(app.getPath('userData'), 'microsoft-auth-cache.json');
 }
 
 function readSettings() {
@@ -44,16 +68,166 @@ function writeSettings(next) {
   return safe;
 }
 
-async function fetchJson(url) {
-  const response = await fetch(`${url}?t=${Date.now()}`, {
+async function fetchJson(url, options = {}) {
+  const separator = url.includes('?') ? '&' : '?';
+  const response = await fetch(`${url}${separator}t=${Date.now()}`, {
+    ...options,
     headers: {
       'User-Agent': `EmiLauncher/${app.getVersion()}`,
-      'Cache-Control': 'no-cache'
+      'Cache-Control': 'no-cache',
+      ...(options.headers || {})
     }
   });
 
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return response.json();
+}
+
+async function resolveMicrosoftClientId() {
+  const local = readLauncherConfig()?.microsoft?.clientId;
+  if (typeof local === 'string' && local.trim()) return local.trim();
+
+  try {
+    const remote = await fetchJson(REMOTE_URLS.launcher);
+    const remoteId = remote?.microsoftClientId;
+    if (typeof remoteId === 'string' && remoteId.trim()) return remoteId.trim();
+  } catch {
+    // Offline is fine; local config remains the fallback.
+  }
+
+  return '';
+}
+
+const cachePlugin = {
+  beforeCacheAccess: async (context) => {
+    try {
+      const serialized = fs.readFileSync(authCacheFile(), 'utf8');
+      context.tokenCache.deserialize(serialized);
+    } catch {
+      // First login: cache file does not exist yet.
+    }
+  },
+  afterCacheAccess: async (context) => {
+    if (!context.cacheHasChanged) return;
+    fs.mkdirSync(path.dirname(authCacheFile()), { recursive: true });
+    fs.writeFileSync(authCacheFile(), context.tokenCache.serialize(), 'utf8');
+  }
+};
+
+async function getMicrosoftClient() {
+  const clientId = await resolveMicrosoftClientId();
+  if (!clientId) return null;
+
+  if (microsoftClient && microsoftClientId === clientId) return microsoftClient;
+
+  microsoftClientId = clientId;
+  microsoftClient = new PublicClientApplication({
+    auth: {
+      clientId,
+      authority: MICROSOFT_AUTHORITY
+    },
+    cache: {
+      cachePlugin
+    }
+  });
+
+  return microsoftClient;
+}
+
+function publicAccount(account) {
+  if (!account) return null;
+  return {
+    homeAccountId: account.homeAccountId || '',
+    localAccountId: account.localAccountId || '',
+    username: account.username || '',
+    name: account.name || account.username || 'Cuenta Microsoft'
+  };
+}
+
+async function getMicrosoftStatus() {
+  const client = await getMicrosoftClient();
+  if (!client) {
+    return { configured: false, authenticated: false, account: null };
+  }
+
+  try {
+    const accounts = await client.getTokenCache().getAllAccounts();
+    if (!accounts.length) return { configured: true, authenticated: false, account: null };
+
+    const account = accounts[0];
+    try {
+      await client.acquireTokenSilent({ account, scopes: MICROSOFT_SCOPES });
+    } catch {
+      // Keep showing the cached account. Interactive login will refresh it if needed.
+    }
+
+    return { configured: true, authenticated: true, account: publicAccount(account) };
+  } catch {
+    return { configured: true, authenticated: false, account: null };
+  }
+}
+
+async function loginMicrosoft() {
+  if (authInProgress) return authInProgress;
+
+  authInProgress = (async () => {
+    const client = await getMicrosoftClient();
+    if (!client) {
+      return {
+        configured: false,
+        authenticated: false,
+        account: null,
+        reason: 'missing_client_id'
+      };
+    }
+
+    const result = await client.acquireTokenByDeviceCode({
+      scopes: MICROSOFT_SCOPES,
+      deviceCodeCallback: (response) => {
+        const payload = {
+          userCode: response.userCode || '',
+          verificationUri: response.verificationUri || 'https://microsoft.com/devicelogin',
+          message: response.message || 'Introduce el código en la página oficial de Microsoft.',
+          expiresIn: response.expiresIn || 0
+        };
+        mainWindow?.webContents.send('auth:microsoft:deviceCode', payload);
+        shell.openExternal(payload.verificationUri).catch(() => {});
+      }
+    });
+
+    return {
+      configured: true,
+      authenticated: Boolean(result?.account),
+      account: publicAccount(result?.account)
+    };
+  })();
+
+  try {
+    return await authInProgress;
+  } finally {
+    authInProgress = null;
+  }
+}
+
+async function logoutMicrosoft() {
+  const client = await getMicrosoftClient();
+  if (client) {
+    try {
+      const accounts = await client.getTokenCache().getAllAccounts();
+      for (const account of accounts) {
+        await client.getTokenCache().removeAccount(account);
+      }
+    } catch {
+      // Clear the serialized cache below even if the in-memory cleanup fails.
+    }
+  }
+
+  try {
+    fs.rmSync(authCacheFile(), { force: true });
+  } catch {}
+
+  microsoftClient = null;
+  return { configured: Boolean(await resolveMicrosoftClientId()), authenticated: false, account: null };
 }
 
 function registerIpc() {
@@ -80,6 +254,16 @@ function registerIpc() {
   ipcMain.handle('remote:getLauncher', () => fetchJson(REMOTE_URLS.launcher));
   ipcMain.handle('remote:getPack', () => fetchJson(REMOTE_URLS.pack));
 
+  ipcMain.handle('auth:microsoft:status', () => getMicrosoftStatus());
+  ipcMain.handle('auth:microsoft:login', () => loginMicrosoft());
+  ipcMain.handle('auth:microsoft:logout', () => logoutMicrosoft());
+  ipcMain.handle('auth:microsoft:openVerification', (_event, url) => {
+    const safe = typeof url === 'string' && /^https:\/\/(microsoft\.com|www\.microsoft\.com|login\.microsoftonline\.com)\//i.test(url)
+      ? url
+      : 'https://microsoft.com/devicelogin';
+    return shell.openExternal(safe);
+  });
+
   ipcMain.handle('external:openNewsEditor', () => shell.openExternal(NEWS_EDITOR_URL));
 
   ipcMain.handle('external:open', (_event, url) => {
@@ -91,7 +275,7 @@ function registerIpc() {
 }
 
 function createWindow() {
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1440,
     height: 860,
     minWidth: 1120,
@@ -107,7 +291,8 @@ function createWindow() {
     }
   });
 
-  win.loadFile(path.join(__dirname, 'index.html'));
+  mainWindow.on('closed', () => { mainWindow = null; });
+  mainWindow.loadFile(path.join(__dirname, 'index.html'));
 }
 
 app.whenReady().then(() => {
