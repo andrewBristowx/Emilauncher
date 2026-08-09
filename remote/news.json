@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-08-09T02:45:00-05:00",
+  "news": [
+    {
+      "id": "bienvenida",
+      "tag": "BIENVENIDA",
+      "title": "¡Bienvenidos a Emipokemon!",
+      "body": "Este launcher será el punto de entrada para Cobbleverse, nuestros mods custom, eventos y futuras actualizaciones del servidor.",
+      "date": "2026-08-09"
+    },
+    {
+      "id": "launcher",
+      "tag": "LAUNCHER",
+      "title": "Noticias actualizables sin reinstalar",
+      "body": "Las noticias se cargan desde GitHub cada vez que abres el launcher. Emi puede editar este archivo y el cambio aparecerá para todos.",
+      "date": "2026-08-09"
+    }
+  ]
+}
