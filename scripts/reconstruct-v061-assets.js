@@ -5,11 +5,13 @@ const crypto = require('crypto');
 const root = path.resolve(__dirname, '..');
 const EXPECTED_SHA256 = '39b5a0a4e97c966e73da256d7de6f89aa7ac3841c32f11b66d5bdb42670bd9a6';
 const EXPECTED_SIZE = 85990;
+const DIAGNOSTIC = path.join(root, 'asset-diagnostic.txt');
 
 function rebuild(parts, destination) {
   const joined = parts.map((relative) => fs.readFileSync(path.join(root, relative), 'utf8').trim()).join('');
   const bytes = Buffer.from(joined, 'base64');
   const sha256 = crypto.createHash('sha256').update(bytes).digest('hex');
+  fs.writeFileSync(DIAGNOSTIC, `joinedChars=${joined.length}\nsize=${bytes.length}\nsha256=${sha256}\n`, 'utf8');
   if (bytes.length !== EXPECTED_SIZE || sha256 !== EXPECTED_SHA256) {
     throw new Error(`Asset HD v0.6.1 inválido: size=${bytes.length}, sha256=${sha256}`);
   }
