@@ -9,7 +9,9 @@ test('runtime dependencies expose the APIs EmiLauncher needs', () => {
   const unzipper = require('unzipper');
   assert.equal(typeof core.Version.parse, 'function');
   assert.equal(typeof core.launch, 'function');
-  assert.equal(typeof installer.completeInstallation, 'function');
+  assert.equal(typeof installer.getVersionList, 'function');
+  assert.equal(typeof installer.install, 'function');
+  assert.equal(typeof installer.installDependencies, 'function');
   assert.equal(typeof user.MicrosoftAuthenticator, 'function');
   assert.equal(typeof unzipper.Open.file, 'function');
 });
@@ -25,7 +27,8 @@ test('mrpack path sanitizer rejects traversal and absolute paths', () => {
   assert.throws(() => safeRelativePath('C:/Windows/test.txt'));
 });
 
-test('Java version parser recognizes Java 21', () => {
+test('Java version parser recognizes Java 21 and legacy Java 8', () => {
   assert.equal(javaMajorFromText('openjdk version "21.0.7" 2025-04-15 LTS'), 21);
+  assert.equal(javaMajorFromText('OpenJDK 21'), 21);
   assert.equal(javaMajorFromText('java version "1.8.0_401"'), 8);
 });
