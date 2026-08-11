@@ -17,20 +17,25 @@ test('v0.6.1 reconstructs the approved HD WebP exactly', () => {
   assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'), '1f605cc7ef45b2a1cf215953903952cbb52f4ec74f2d57ed93a549f9ba5bbe43');
 });
 
-test('v0.6.1 UI uses the HD asset and keeps the simplified controls', () => {
+test('v0.6.1 UI uses HD art while rendering its logo and controls independently', () => {
   const html = read('src/index-v06.html');
   const renderer = read('src/renderer-v06.js');
   const layout = read('src/v06-layout.css');
+  const logo = read('src/assets/v061-logo.svg');
   assert.match(html, /assets\/v061-background\.webp/);
   assert.match(renderer, /assets\/v061-background\.webp/);
+  assert.match(html, /assets\/v061-logo\.svg/);
+  assert.match(logo, /EMIPOKEMON/);
   assert.match(html, /v0\.6\.1/);
   assert.match(html, /id="primaryButton"/);
   assert.match(html, /id="folderButton"/);
   assert.match(html, /id="settingsButton"/);
   assert.match(html, /id="ramButton"/);
+  assert.doesNotMatch(html, /logo-crop/);
   assert.doesNotMatch(html, /Noticias y comunidad|Cuenta Microsoft|newsSection|accountButton/);
   assert.match(layout, /image-rendering:auto/);
-  assert.match(layout, /logo-crop/);
+  assert.match(layout, /brand-logo/);
+  assert.match(layout, /title-backdrop/);
 });
 
 test('v0.6.1 uses a native 16:9 fixed preview to avoid stretching the art', () => {
