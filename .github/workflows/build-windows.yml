@@ -28,6 +28,9 @@ jobs:
       - name: Syntax check
         run: npm run check
 
+      - name: Reconstruct HD assets
+        run: npm run prepare-assets
+
       - name: Runtime tests
         run: npm test
 
