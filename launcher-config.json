@@ -1,0 +1,20 @@
+{
+  "launcherVersion": "0.2.0-preview",
+  "packName": "Emipokemon",
+  "minecraftVersion": "1.21.1",
+  "loader": "Fabric",
+  "serverName": "Cobbleverse",
+  "serverAddress": "play.emipokemon.local",
+  "packChannel": "preview",
+  "remote": {
+    "news": "https://raw.githubusercontent.com/andrewBristowx/Emilauncher/main/remote/news.json",
+    "launcher": "https://raw.githubusercontent.com/andrewBristowx/Emilauncher/main/remote/launcher.json",
+    "pack": "https://raw.githubusercontent.com/andrewBristowx/Emilauncher/main/remote/pack-manifest.json",
+    "newsEditor": "https://github.com/andrewBristowx/Emilauncher/edit/main/remote/news.json"
+  },
+  "defaults": {
+    "ramGb": 6,
+    "autoCheckNews": true,
+    "closeLauncherOnGame": false
+  }
+}
