@@ -3,8 +3,8 @@ const path = require('path');
 const crypto = require('crypto');
 
 const root = path.resolve(__dirname, '..');
-const EXPECTED_SHA256 = '39b5a0a4e97c966e73da256d7de6f89aa7ac3841c32f11b66d5bdb42670bd9a6';
-const EXPECTED_SIZE = 85990;
+const EXPECTED_SHA256 = '1f605cc7ef45b2a1cf215953903952cbb52f4ec74f2d57ed93a549f9ba5bbe43';
+const EXPECTED_SIZE = 85992;
 const DIAGNOSTIC = path.join(root, 'asset-diagnostic.txt');
 
 function rebuild(parts, destination) {
