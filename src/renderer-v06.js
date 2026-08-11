@@ -24,15 +24,7 @@ const minimizeButton = $('#minimizeButton');
 const closeButton = $('#closeButton');
 const toast = $('#toast');
 
-const BG_PARTS = [
-  'assets/v06-bg-1.b64',
-  'assets/v06-bg-2.b64',
-  'assets/v06-bg-3.b64',
-  'assets/v06-bg-4.b64',
-  'assets/v06-bg-5.b64',
-  'assets/v06-bg-6.b64',
-  'assets/v06-bg-7.b64'
-];
+sceneBackground.src = 'assets/v06-background.jpg';
 
 let currentState = null;
 let busy = false;
@@ -43,20 +35,6 @@ function showToast(message) {
   toast.classList.add('show');
   clearTimeout(showToast.timer);
   showToast.timer = setTimeout(() => toast.classList.remove('show'), 3300);
-}
-
-async function loadBackground() {
-  try {
-    const parts = await Promise.all(BG_PARTS.map(async (url) => {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`No se pudo cargar ${url}`);
-      return (await response.text()).trim();
-    }));
-    sceneBackground.src = `data:image/jpeg;base64,${parts.join('')}`;
-  } catch (error) {
-    console.error(error);
-    sceneBackground.removeAttribute('src');
-  }
 }
 
 function setStatusTone(tone) {
@@ -90,22 +68,22 @@ function setBusy(next) {
   if (!next) {
     progressWrap.hidden = true;
     progressBar.style.width = '0%';
+    progressBar.dataset.fake = '0';
   }
 }
 
 function showProgress(payload) {
   const total = Number(payload?.total || 0);
   const current = Number(payload?.current || 0);
+  progressWrap.hidden = false;
   if (total > 0) {
-    progressWrap.hidden = false;
     progressBar.style.width = `${Math.max(2, Math.min(100, Math.round((current / total) * 100)))}%`;
-  } else if (busy) {
-    progressWrap.hidden = false;
-    const previous = Number(progressBar.dataset.fake || 8);
-    const next = Math.min(92, previous + 7);
-    progressBar.dataset.fake = String(next);
-    progressBar.style.width = `${next}%`;
+    return;
   }
+  const previous = Number(progressBar.dataset.fake || 8);
+  const next = Math.min(92, previous + 7);
+  progressBar.dataset.fake = String(next);
+  progressBar.style.width = `${next}%`;
 }
 
 async function refreshState() {
@@ -129,12 +107,14 @@ async function runPrimaryAction() {
     try {
       const result = await window.emiApi.play();
       if (!result?.ok) throw new Error(result?.error?.message || 'No se pudo abrir Minecraft Launcher.');
-      showToast('Minecraft Launcher abierto · usa el perfil EmiCobleverse.');
-      renderState(result.state || currentState);
+      statusText.textContent = 'Minecraft Launcher abierto · perfil EmiCobleverse listo';
+      setStatusTone('ready');
+      showToast('Minecraft Launcher abierto. Selecciona EmiCobleverse y pulsa Jugar.');
     } catch (error) {
       console.error(error);
-      showToast(error.message || 'No se pudo abrir Minecraft Launcher.');
+      statusText.textContent = error.message || 'No se pudo abrir Minecraft Launcher';
       setStatusTone('error');
+      showToast(error.message || 'No se pudo abrir Minecraft Launcher.');
     } finally {
       setBusy(false);
       await refreshState();
@@ -144,7 +124,7 @@ async function runPrimaryAction() {
 
   setBusy(true);
   primaryLabel.textContent = action === 'update' ? 'ACTUALIZANDO…' : 'INSTALANDO…';
-  primaryIcon.textContent = '⬇';
+  primaryIcon.textContent = action === 'update' ? '↻' : '⬇';
   progressBar.dataset.fake = '8';
   progressWrap.hidden = false;
   progressBar.style.width = '8%';
@@ -152,7 +132,7 @@ async function runPrimaryAction() {
 
   try {
     const result = await window.emiApi.installOrUpdate();
-    if (!result?.ok) throw new Error(result?.error?.message || 'No se pudo instalar EmiCobleverse.');
+    if (!result?.ok) throw new Error(result?.error?.message || 'No se pudo preparar EmiCobleverse.');
     progressBar.style.width = '100%';
     statusText.textContent = 'EmiCobleverse está listo';
     setStatusTone('ready');
@@ -162,7 +142,7 @@ async function runPrimaryAction() {
     console.error(error);
     statusText.textContent = error.message || 'Error de instalación';
     setStatusTone('error');
-    showToast(error.message || 'No se pudo instalar EmiCobleverse.');
+    showToast(error.message || 'No se pudo preparar EmiCobleverse.');
   } finally {
     setTimeout(async () => {
       setBusy(false);
@@ -171,20 +151,14 @@ async function runPrimaryAction() {
   }
 }
 
-function openSettings() {
-  settingsPanel.hidden = false;
-}
-
-function closeSettings() {
-  settingsPanel.hidden = true;
-}
+function openSettings() { settingsPanel.hidden = false; }
+function closeSettings() { settingsPanel.hidden = true; }
 
 function queueRamSave(value) {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
     try {
-      const next = await window.emiApi.saveSettings({ ramGb: Number(value) });
-      renderState(next);
+      renderState(await window.emiApi.saveSettings({ ramGb: Number(value) }));
       showToast(`RAM configurada en ${value} GB.`);
     } catch (error) {
       console.error(error);
@@ -198,33 +172,27 @@ folderButton.addEventListener('click', async () => {
   try {
     const result = await window.emiApi.openGameFolder();
     if (result?.ok === false) throw new Error(result.error || 'No se pudo abrir la carpeta.');
-  } catch (error) {
-    showToast(error.message || 'No se pudo abrir la carpeta.');
-  }
+  } catch (error) { showToast(error.message || 'No se pudo abrir la carpeta.'); }
 });
 settingsButton.addEventListener('click', openSettings);
 ramButton.addEventListener('click', openSettings);
 settingsClose.addEventListener('click', closeSettings);
-settingsPanel.addEventListener('click', (event) => {
-  if (event.target === settingsPanel) closeSettings();
-});
+settingsPanel.addEventListener('click', (event) => { if (event.target === settingsPanel) closeSettings(); });
 
 chooseDirectoryButton.addEventListener('click', async () => {
   try {
-    renderState(await window.emiApi.chooseGameDirectory());
+    const state = await window.emiApi.chooseGameDirectory();
+    if (state) renderState(state);
     showToast('Carpeta de EmiCobleverse actualizada.');
-  } catch (error) {
-    showToast(error.message || 'No se pudo elegir la carpeta.');
-  }
+  } catch (error) { showToast(error.message || 'No se pudo elegir la carpeta.'); }
 });
 
 chooseMrpackButton.addEventListener('click', async () => {
   try {
-    renderState(await window.emiApi.chooseMrpack());
+    const state = await window.emiApi.chooseMrpack();
+    if (state) renderState(state);
     showToast('Archivo .mrpack seleccionado.');
-  } catch (error) {
-    showToast(error.message || 'No se pudo elegir el .mrpack.');
-  }
+  } catch (error) { showToast(error.message || 'No se pudo elegir el .mrpack.'); }
 });
 
 ramRange.addEventListener('input', () => {
@@ -241,10 +209,7 @@ window.emiApi.onStatus((payload) => {
   statusText.textContent = payload.message || statusText.textContent;
   if (payload.phase === 'error') setStatusTone('error');
   else if (payload.phase === 'ready' || payload.phase === 'launcher-open') setStatusTone('ready');
-  showProgress(payload);
+  if (busy && payload.phase !== 'launcher-open') showProgress(payload);
 });
 
-(async () => {
-  await loadBackground();
-  await refreshState();
-})();
+refreshState();
