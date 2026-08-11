@@ -25,12 +25,18 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Syntax check
+        run: npm run check
+
+      - name: Runtime tests
+        run: npm test
+
       - name: Build portable EXE
         run: npm run dist
 
       - name: Upload Windows launcher
         uses: actions/upload-artifact@v4
         with:
-          name: EmiLauncher-0.4.0-Windows
+          name: EmiLauncher-0.5.1-Windows
           path: dist/*.exe
           if-no-files-found: error
