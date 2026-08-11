@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self';" />
+  <title>EmiLauncher</title>
+  <link rel="stylesheet" href="v06.css" />
+  <link rel="stylesheet" href="v06-layout.css" />
+</head>
+<body>
+  <main class="launcher" aria-label="EmiLauncher">
+    <img id="sceneBackground" class="scene-background" alt="Fondo de EmiLauncher" draggable="false" />
+    <div class="scene-shade"></div>
+
+    <header class="window-bar">
+      <div class="window-title">✦ EmiLauncher</div>
+      <div class="window-actions">
+        <button id="minimizeButton" type="button" aria-label="Minimizar">—</button>
+        <button id="closeButton" type="button" aria-label="Cerrar">×</button>
+      </div>
+    </header>
+
+    <section class="primary-zone">
+      <button id="primaryButton" class="primary-button" type="button">
+        <span id="primaryIcon" class="primary-icon">⬇</span>
+        <span id="primaryLabel">INSTALAR</span>
+      </button>
+      <div id="statusPill" class="status-pill">
+        <span id="statusDot" class="status-dot"></span>
+        <span id="statusText">Comprobando instalación…</span>
+      </div>
+      <div id="progressWrap" class="progress-wrap" hidden><div id="progressBar" class="progress-bar"></div></div>
+    </section>
+
+    <nav class="quick-actions" aria-label="Acciones rápidas">
+      <button id="folderButton" class="quick-button" type="button"><span class="quick-icon">▣</span><span>Carpeta</span></button>
+      <button id="settingsButton" class="quick-button" type="button"><span class="quick-icon">⚙</span><span>Ajustes</span></button>
+      <button id="ramButton" class="quick-button" type="button"><span class="quick-icon">RAM</span><span id="ramQuickText">6 GB</span></button>
+    </nav>
+
+    <div class="version-badge">v0.6.0</div>
+
+    <aside id="settingsPanel" class="settings-panel" aria-label="Ajustes" hidden>
+      <div class="settings-card">
+        <div class="settings-heading">
+          <div><span class="eyebrow">EMILAUNCHER</span><h2>Ajustes</h2></div>
+          <button id="settingsClose" class="settings-close" type="button" aria-label="Cerrar ajustes">×</button>
+        </div>
+
+        <label class="field-label">Carpeta de EmiCobleverse</label>
+        <div class="field-row"><input id="gameDirectory" type="text" readonly /><button id="chooseDirectoryButton" type="button">Elegir</button></div>
+
+        <label class="field-label">Archivo del modpack</label>
+        <div class="field-row"><input id="mrpackPath" type="text" readonly /><button id="chooseMrpackButton" type="button">Elegir .mrpack</button></div>
+
+        <label class="field-label ram-label-row"><span>Memoria RAM</span><strong id="ramValue">6 GB</strong></label>
+        <input id="ramRange" class="ram-range" type="range" min="4" max="16" step="1" value="6" />
+        <div class="ram-scale"><span>4 GB</span><span>8 GB</span><span>12 GB</span><span>16 GB</span></div>
+
+        <div class="settings-note">EmiLauncher instala y actualiza EmiCobleverse. Cuando esté listo, JUGAR abre el Minecraft Launcher oficial con el perfil EmiCobleverse preparado.</div>
+      </div>
+    </aside>
+
+    <div id="toast" class="toast" role="status"></div>
+  </main>
+  <script src="renderer-v06.js"></script>
+</body>
+</html>

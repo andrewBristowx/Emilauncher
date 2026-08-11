@@ -1,22 +1,20 @@
 {
   "name": "emilauncher",
-  "version": "0.5.2",
-  "description": "Launcher propio y actualizable para Emipokemon / Cobbleverse",
-  "main": "src/main.js",
+  "version": "0.6.0",
+  "description": "Instalador y actualizador simplificado de Emipokemon / EmiCobleverse",
+  "main": "src/main-v06.js",
   "author": "Emi / Pony0n",
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
     "start": "electron .",
-    "check": "node --check src/main.js && node --check src/preload.js && node --check src/renderer.js && node --check src/functional-v05.js && node --check src/minecraft-runtime.js && node --check src/minecraft-auth.js",
-    "test": "node --test tests/runtime.test.js",
+    "check": "node --check src/main-v06.js && node --check src/preload-v06.js && node --check src/renderer-v06.js && node --check src/minecraft-runtime.js && node --check src/official-launcher-bridge.js",
+    "test": "node --test tests/runtime.test.js tests/v06.test.js",
     "dist": "electron-builder --win portable --x64"
   },
   "dependencies": {
-    "@azure/msal-node": "5.4.2",
     "@xmcl/core": "2.15.1",
     "@xmcl/installer": "6.1.2",
-    "@xmcl/user": "4.3.0",
     "unzipper": "0.12.5"
   },
   "devDependencies": {
@@ -31,7 +29,6 @@
     },
     "files": [
       "src/**/*",
-      "launcher-config.json",
       "package.json"
     ],
     "win": {
