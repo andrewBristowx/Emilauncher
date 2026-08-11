@@ -6,7 +6,7 @@ const { Readable } = require('stream');
 const { pipeline } = require('stream/promises');
 const unzipper = require('unzipper');
 const { Version, launch } = require('@xmcl/core');
-const { completeInstallation } = require('@xmcl/installer');
+const { getVersionList, install, installDependencies } = require('@xmcl/installer');
 
 const SUPPORTED_MINECRAFT = '1.21.1';
 const SUPPORTED_FABRIC = '0.18.4';
@@ -219,23 +219,15 @@ async function writeJsonAtomic(filePath, value) {
   fs.renameSync(temp, filePath);
 }
 
-async function ensureVersionJson(gameDirectory, minecraftVersion, progress) {
-  const versionPath = path.join(gameDirectory, 'versions', minecraftVersion, `${minecraftVersion}.json`);
-  if (!fs.existsSync(versionPath)) {
-    emit(progress, 'runtime-vanilla-meta', `Descargando metadatos de Minecraft ${minecraftVersion}…`);
-    const manifest = await fetchJson('https://piston-meta.mojang.com/mc/game/version_manifest_v2.json');
-    const entry = manifest?.versions?.find((version) => version.id === minecraftVersion);
-    if (!entry?.url) throw new LauncherRuntimeError('minecraft_version_not_found', `Minecraft ${minecraftVersion} no aparece en el manifiesto oficial.`);
-    await writeJsonAtomic(versionPath, await fetchJson(entry.url));
-  }
-  return versionPath;
-}
-
 async function ensureMinecraftRuntime(gameDirectory, minecraftVersion = SUPPORTED_MINECRAFT, loaderVersion = SUPPORTED_FABRIC, progress) {
-  await ensureVersionJson(gameDirectory, minecraftVersion, progress);
-  emit(progress, 'runtime-vanilla', `Verificando Minecraft ${minecraftVersion}…`);
-  const vanilla = await Version.parse(gameDirectory, minecraftVersion);
-  await completeInstallation(vanilla);
+  emit(progress, 'runtime-vanilla-meta', `Buscando Minecraft ${minecraftVersion}…`);
+  const versionList = await getVersionList();
+  const versionMeta = versionList?.versions?.find((version) => version.id === minecraftVersion);
+  if (!versionMeta) throw new LauncherRuntimeError('minecraft_version_not_found', `Minecraft ${minecraftVersion} no aparece en el manifiesto oficial.`);
+
+  emit(progress, 'runtime-vanilla', `Verificando Minecraft ${minecraftVersion}, librerías y assets…`);
+  await install(versionMeta, gameDirectory);
+
   const fabricId = `fabric-loader-${loaderVersion}-${minecraftVersion}`;
   const fabricPath = path.join(gameDirectory, 'versions', fabricId, `${fabricId}.json`);
   if (!fs.existsSync(fabricPath)) {
@@ -246,16 +238,18 @@ async function ensureMinecraftRuntime(gameDirectory, minecraftVersion = SUPPORTE
     profile.id = fabricId;
     await writeJsonAtomic(fabricPath, profile);
   }
-  emit(progress, 'runtime-fabric', `Verificando Fabric ${loaderVersion} y librerías…`);
+
+  emit(progress, 'runtime-fabric', `Verificando Fabric ${loaderVersion} y sus dependencias…`);
   const resolved = await Version.parse(gameDirectory, fabricId);
-  await completeInstallation(resolved);
+  await installDependencies(resolved);
   return fabricId;
 }
 
 function javaMajorFromText(text) {
-  const match = String(text).match(/version\s+"(?:(1)\.)?(\d+)/i) || String(text).match(/openjdk\s+(\d+)/i);
-  if (!match) return null;
-  return Number(match[1] ? match[2] : (match[2] || match[1]));
+  const quoted = String(text).match(/version\s+"(?:(1)\.)?(\d+)/i);
+  if (quoted) return Number(quoted[2]);
+  const plain = String(text).match(/openjdk\s+(\d+)/i);
+  return plain ? Number(plain[1]) : null;
 }
 
 function verifyJavaCandidate(executable) {
