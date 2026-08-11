@@ -1,5 +1,5 @@
 {
-  "launcherVersion": "0.5.0-preview",
+  "launcherVersion": "0.5.1-preview",
   "packName": "EmiCobleverse",
   "minecraftVersion": "1.21.1",
   "loader": "Fabric",
@@ -12,13 +12,13 @@
     "twitch": "https://www.twitch.tv/emiilyextacy"
   },
   "microsoft": {
-    "clientId": "",
+    "clientId": "d0177d25-c2e1-42c1-9465-44bf2cbd3920",
     "authority": "https://login.microsoftonline.com/consumers",
     "scopes": [
       "XboxLive.signin",
       "offline_access"
     ],
-    "note": "Public client only. Set an Application (client) ID locally or publish microsoftClientId in remote/launcher.json. Never add a client secret. Minecraft Services may require this app registration to be approved/authorized."
+    "note": "Public client only. Application (client) ID for EmiLauncher is bundled in this test build. Never add a client secret. Minecraft Services may require this app registration to be approved/authorized."
   },
   "developmentPack": {
     "mode": "local-mrpack",
