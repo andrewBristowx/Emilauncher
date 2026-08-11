@@ -9,6 +9,20 @@ class MinecraftAuthError extends Error {
   }
 }
 
+function getRuntimeFetch() {
+  if (typeof globalThis.fetch !== 'function') {
+    throw new MinecraftAuthError(
+      'fetch_unavailable',
+      'Esta versión de EmiLauncher no encontró la API de red necesaria para autenticar Minecraft.'
+    );
+  }
+  // @xmcl/user 4.3.0 expects MicrosoftAuthenticatorOptions and reads
+  // options.fetch. Always inject a concrete function instead of relying on
+  // constructor defaults so the packaged Electron runtime behaves the same
+  // as our CI tests.
+  return (input, init) => globalThis.fetch(input, init);
+}
+
 async function readResponseBody(response) {
   const text = await response.text();
   try { return text ? JSON.parse(text) : {}; }
@@ -29,12 +43,12 @@ function authErrorFrom(error) {
   return new MinecraftAuthError('minecraft_auth_failed', error?.message || 'Falló la autenticación de Xbox/Minecraft.', raw.slice(0, 4000));
 }
 
-async function fetchMinecraftProfile(accessToken) {
-  const response = await fetch('https://api.minecraftservices.com/minecraft/profile', {
+async function fetchMinecraftProfile(accessToken, runtimeFetch = getRuntimeFetch()) {
+  const response = await runtimeFetch('https://api.minecraftservices.com/minecraft/profile', {
     headers: {
       Authorization: `Bearer ${accessToken}`,
       Accept: 'application/json',
-      'User-Agent': 'EmiLauncher/0.5.0'
+      'User-Agent': 'EmiLauncher/0.5.2'
     }
   });
   const body = await readResponseBody(response);
@@ -53,7 +67,8 @@ async function fetchMinecraftProfile(accessToken) {
 async function exchangeMicrosoftForMinecraft(msAccessToken) {
   if (!msAccessToken) throw new MinecraftAuthError('microsoft_token_missing', 'Falta el token de Microsoft.');
   try {
-    const authenticator = new MicrosoftAuthenticator();
+    const runtimeFetch = getRuntimeFetch();
+    const authenticator = new MicrosoftAuthenticator({ fetch: runtimeFetch });
     const xbox = await authenticator.acquireXBoxToken(msAccessToken);
     const xsts = xbox?.minecraftXstsResponse;
     const uhs = xsts?.DisplayClaims?.xui?.[0]?.uhs;
@@ -62,7 +77,7 @@ async function exchangeMicrosoftForMinecraft(msAccessToken) {
     const minecraft = await authenticator.loginMinecraftWithXBox(uhs, token);
     const accessToken = minecraft?.access_token;
     if (!accessToken) throw new Error('Minecraft Services no devolvió access_token.');
-    const profile = await fetchMinecraftProfile(accessToken);
+    const profile = await fetchMinecraftProfile(accessToken, runtimeFetch);
     return { accessToken, expiresIn: Number(minecraft?.expires_in || 0), profile };
   } catch (error) {
     if (error instanceof MinecraftAuthError) throw error;
@@ -70,4 +85,14 @@ async function exchangeMicrosoftForMinecraft(msAccessToken) {
   }
 }
 
-module.exports = { MinecraftAuthError, exchangeMicrosoftForMinecraft, fetchMinecraftProfile };
+function createMicrosoftAuthenticatorForTest(fetchImpl) {
+  return new MicrosoftAuthenticator({ fetch: fetchImpl });
+}
+
+module.exports = {
+  MinecraftAuthError,
+  exchangeMicrosoftForMinecraft,
+  fetchMinecraftProfile,
+  getRuntimeFetch,
+  createMicrosoftAuthenticatorForTest
+};

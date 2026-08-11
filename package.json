@@ -1,6 +1,6 @@
 {
   "name": "emilauncher",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Launcher propio y actualizable para Emipokemon / Cobbleverse",
   "main": "src/main.js",
   "author": "Emi / Pony0n",
