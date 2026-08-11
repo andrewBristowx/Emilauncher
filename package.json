@@ -14,9 +14,9 @@
   },
   "dependencies": {
     "@azure/msal-node": "5.4.2",
-    "@xmcl/core": "2.16.0",
-    "@xmcl/installer": "6.3.1",
-    "@xmcl/user": "4.4.1",
+    "@xmcl/core": "2.15.1",
+    "@xmcl/installer": "6.1.2",
+    "@xmcl/user": "4.3.0",
     "unzipper": "0.12.5"
   },
   "devDependencies": {
