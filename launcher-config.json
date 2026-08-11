@@ -1,11 +1,12 @@
 {
-  "launcherVersion": "0.4.0-preview",
-  "packName": "Emipokemon",
+  "launcherVersion": "0.5.0-preview",
+  "packName": "EmiCobleverse",
   "minecraftVersion": "1.21.1",
   "loader": "Fabric",
+  "loaderVersion": "0.18.4",
   "serverName": "Cobbleverse",
   "serverAddress": "play.emipokemon.local",
-  "packChannel": "preview",
+  "packChannel": "development",
   "community": {
     "discord": "https://discord.gg/s3XJZCp42",
     "twitch": "https://www.twitch.tv/emiilyextacy"
@@ -14,9 +15,15 @@
     "clientId": "",
     "authority": "https://login.microsoftonline.com/consumers",
     "scopes": [
-      "User.Read"
+      "XboxLive.signin",
+      "offline_access"
     ],
-    "note": "Public client: set the Application (client) ID here or publish microsoftClientId in remote/launcher.json. Never add a client secret to the desktop launcher."
+    "note": "Public client only. Set an Application (client) ID locally or publish microsoftClientId in remote/launcher.json. Never add a client secret. Minecraft Services may require this app registration to be approved/authorized."
+  },
+  "developmentPack": {
+    "mode": "local-mrpack",
+    "expectedName": "EmiCobleverse 1.0.0.mrpack",
+    "preserveLocalOverridesAfterFirstInstall": true
   },
   "remote": {
     "news": "https://raw.githubusercontent.com/andrewBristowx/Emilauncher/main/remote/news.json",
