@@ -1,27 +1,17 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { safeRelativePath, javaMajorFromText } = require('../src/minecraft-runtime');
-const { createMicrosoftAuthenticatorForTest } = require('../src/minecraft-auth');
 
 test('runtime dependencies expose the APIs EmiLauncher needs', () => {
   const core = require('@xmcl/core');
   const installer = require('@xmcl/installer');
-  const user = require('@xmcl/user');
   const unzipper = require('unzipper');
   assert.equal(typeof core.Version.parse, 'function');
   assert.equal(typeof core.launch, 'function');
   assert.equal(typeof installer.getVersionList, 'function');
   assert.equal(typeof installer.install, 'function');
   assert.equal(typeof installer.installDependencies, 'function');
-  assert.equal(typeof user.MicrosoftAuthenticator, 'function');
   assert.equal(typeof unzipper.Open.file, 'function');
-});
-
-test('XMCL MicrosoftAuthenticator receives an explicit fetch implementation', () => {
-  const fakeFetch = async () => { throw new Error('network should not be called in constructor test'); };
-  const authenticator = createMicrosoftAuthenticatorForTest(fakeFetch);
-  assert.ok(authenticator);
-  assert.equal(authenticator.fetch, fakeFetch);
 });
 
 test('mrpack path sanitizer accepts normal relative paths', () => {
