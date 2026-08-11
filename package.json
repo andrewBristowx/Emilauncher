@@ -10,7 +10,7 @@
     "prepare-assets": "node scripts/reconstruct-v061-assets.js",
     "start": "npm run prepare-assets && electron .",
     "check": "node --check scripts/reconstruct-v061-assets.js && node --check src/main-v06.js && node --check src/preload-v06.js && node --check src/renderer-v06.js && node --check src/minecraft-runtime.js && node --check src/official-launcher-bridge.js",
-    "test": "npm run prepare-assets && node --test tests/runtime.test.js tests/v06.test.js tests/v061-hd.test.js",
+    "test": "node --test tests/runtime.test.js tests/v06.test.js tests/v061-hd.test.js",
     "dist": "npm run prepare-assets && electron-builder --win portable --x64"
   },
   "dependencies": {
