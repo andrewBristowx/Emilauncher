@@ -24,7 +24,7 @@ const minimizeButton = $('#minimizeButton');
 const closeButton = $('#closeButton');
 const toast = $('#toast');
 
-sceneBackground.src = 'assets/v06-background.jpg';
+sceneBackground.src = 'assets/v061-background.webp';
 
 let currentState = null;
 let busy = false;

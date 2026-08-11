@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 190" role="img" aria-label="Emipokemon">
+  <defs>
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff0fb"/>
+      <stop offset="0.38" stop-color="#ffc6ec"/>
+      <stop offset="1" stop-color="#ef79c6"/>
+    </linearGradient>
+    <linearGradient id="depth" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a63b93"/>
+      <stop offset="1" stop-color="#5c185f"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-30%" width="140%" height="180%">
+      <feDropShadow dx="0" dy="10" stdDeviation="7" flood-color="#2b092f" flood-opacity="0.52"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)" font-family="Arial Black, Impact, Haettenschweiler, sans-serif" font-weight="900" text-anchor="middle" letter-spacing="3">
+    <text x="500" y="144" font-size="139" fill="url(#depth)" stroke="#33103d" stroke-width="25" paint-order="stroke fill">EMIPOKEMON</text>
+    <text x="500" y="132" font-size="139" fill="url(#face)" stroke="#fff0f8" stroke-width="7" paint-order="stroke fill">EMIPOKEMON</text>
+    <text x="500" y="132" font-size="139" fill="none" stroke="#7d267b" stroke-width="3">EMIPOKEMON</text>
+  </g>
+  <g fill="#ffd4ed" opacity="0.9">
+    <path d="M68 41h9v-9h8v9h9v8h-9v9h-8v-9h-9z"/>
+    <path d="M916 48h7v-7h7v7h7v7h-7v7h-7v-7h-7z"/>
+  </g>
+</svg>

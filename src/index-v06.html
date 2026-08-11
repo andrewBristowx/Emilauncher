@@ -10,7 +10,7 @@
 </head>
 <body>
   <main class="launcher" aria-label="EmiLauncher">
-    <img id="sceneBackground" class="scene-background" alt="Fondo de EmiLauncher" draggable="false" />
+    <img id="sceneBackground" class="scene-background" src="assets/v061-background.webp" alt="Fondo HD de EmiLauncher" draggable="false" />
     <div class="scene-shade"></div>
 
     <header class="window-bar">
@@ -20,6 +20,12 @@
         <button id="closeButton" type="button" aria-label="Cerrar">×</button>
       </div>
     </header>
+
+    <section class="title-zone" aria-label="Emipokemon">
+      <div class="title-backdrop"></div>
+      <img class="brand-logo" src="assets/v061-logo.svg" alt="Emipokemon" draggable="false" />
+      <div class="tagline"><span>◉</span> COBBLEMON <b>▪</b> AVENTURA <b>▪</b> AMISTAD <span>◉</span></div>
+    </section>
 
     <section class="primary-zone">
       <button id="primaryButton" class="primary-button" type="button">
@@ -39,7 +45,7 @@
       <button id="ramButton" class="quick-button" type="button"><span class="quick-icon">RAM</span><span id="ramQuickText">6 GB</span></button>
     </nav>
 
-    <div class="version-badge">v0.6.0</div>
+    <div class="version-badge">v0.6.1</div>
 
     <aside id="settingsPanel" class="settings-panel" aria-label="Ajustes" hidden>
       <div class="settings-card">
