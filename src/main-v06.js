@@ -100,7 +100,7 @@ async function chooseGameDirectoryInternal() {
 }
 
 async function ensureMrpack() {
-  let settings = resolvedSettings();
+  const settings = resolvedSettings();
   if (settings.mrpackPath && fs.existsSync(settings.mrpackPath)) return settings.mrpackPath;
   const selected = await chooseMrpackInternal();
   if (!selected) {
@@ -233,13 +233,19 @@ function registerIpc() {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    minWidth: 900,
-    minHeight: 600,
+    width: 1152,
+    height: 648,
+    minWidth: 1152,
+    minHeight: 648,
+    maxWidth: 1152,
+    maxHeight: 648,
+    useContentSize: true,
+    resizable: false,
+    maximizable: false,
     frame: false,
     backgroundColor: '#1a1023',
     autoHideMenuBar: true,
+    center: true,
     title: 'EmiLauncher',
     webPreferences: {
       preload: path.join(__dirname, 'preload-v06.js'),
@@ -248,7 +254,6 @@ function createWindow() {
       sandbox: true
     }
   });
-  try { mainWindow.setAspectRatio(1.5); } catch {}
   mainWindow.on('closed', () => { mainWindow = null; });
   mainWindow.loadFile(path.join(__dirname, 'index-v06.html'));
 }
