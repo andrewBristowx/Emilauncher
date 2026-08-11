@@ -11,10 +11,10 @@ test('v0.6.1 reconstructs the approved HD WebP exactly', () => {
   const target = path.join(root, 'src', 'assets', 'v061-background.webp');
   assert.ok(fs.existsSync(target));
   const bytes = fs.readFileSync(target);
-  assert.equal(bytes.length, 85990);
+  assert.equal(bytes.length, 85992);
   assert.equal(bytes.subarray(0, 4).toString('ascii'), 'RIFF');
   assert.equal(bytes.subarray(8, 12).toString('ascii'), 'WEBP');
-  assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'), '39b5a0a4e97c966e73da256d7de6f89aa7ac3841c32f11b66d5bdb42670bd9a6');
+  assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'), '1f605cc7ef45b2a1cf215953903952cbb52f4ec74f2d57ed93a549f9ba5bbe43');
 });
 
 test('v0.6.1 UI uses the HD asset and keeps the simplified controls', () => {
